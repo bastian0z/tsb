@@ -1,9 +1,11 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
 
 local LocalPlayer = Players.LocalPlayer
+local CurrentCamera = Workspace.CurrentCamera
 
 local MainWindow = OrionLib:MakeWindow({
     Name = "TSB Script",
@@ -38,11 +40,13 @@ PlayerTab:AddToggle({
     Flag = "invisblock"
 })
 
+--[[
 PlayerTab:AddToggle({
 	Name = "Fly",
 	Default = false,
     Flag = "fly"
 })
+]]
 
 PlayerTab:AddToggle({
 	Name = "CFrame Walk",
@@ -85,7 +89,7 @@ RunService.Heartbeat:Connect(function()
 			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
 				for _,Child in pairs(LocalPlayer.Character.HumanoidRootPart:GetChildren()) do
 					if Child:IsA("BodyVelocity") then
-						if Child.Name ~= "moveme" and Child.Name ~= "dodgevelocity" then
+						if Child.Name ~= "moveme" and Child.Name ~= "dodgevelocity" and Child.Name ~= "FlyForce" then
 							Child:Destroy()
 						end
 					end
@@ -157,6 +161,20 @@ RunService.Heartbeat:Connect(function()
 			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
 				if LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character:FindFirstChild("Humanoid") then
 					LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame + LocalPlayer.Character.Humanoid.MoveDirection * OrionLib.Flags["cframewalkspeed"].Value/100
+				end
+			end
+		end
+		if OrionLib.Flags["fly"].Value == true then
+			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+				if LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character:FindFirstChild("Humanoid") then
+					if not LocalPlayer.Character.HumanoidRootPart:FindFirstChild("FlyForce") then
+						local FlyForce =  Instance.new("BodyVelocity")
+						FlyForce.MaxForce = Vector3.new(10000, 10000, 10000)
+						FlyForce.Velocity = Vector3.new(0, 0, 0)
+						FlyForce.P = 0
+
+						FlyForce.Velocity = LocalPlayer.Character.Humanoid.MoveDirection*10
+					end
 				end
 			end
 		end
