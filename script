@@ -1,0 +1,166 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+
+local LocalPlayer = Players.LocalPlayer
+
+local MainWindow = OrionLib:MakeWindow({
+    Name = "TSB Script",
+})
+
+local PlayerTab = MainWindow:MakeTab({
+	Name = "Player",
+	Icon = "rbxassetid://4483345998",
+})
+
+PlayerTab:AddToggle({
+	Name = "Anti Stun",
+	Default = false,
+    Flag = "antistun"
+})
+
+PlayerTab:AddToggle({
+	Name = "Anti Ragdoll",
+	Default = false,
+    Flag = "antiragdoll"
+})
+
+PlayerTab:AddToggle({
+	Name = "Anti Velocity",
+	Default = false,
+    Flag = "antivelocity"
+})
+
+PlayerTab:AddToggle({
+	Name = "Invis Block",
+	Default = false,
+    Flag = "invisblock"
+})
+
+PlayerTab:AddToggle({
+	Name = "Fly",
+	Default = false,
+    Flag = "fly"
+})
+
+PlayerTab:AddToggle({
+	Name = "CFrame Walk",
+	Default = false,
+    Flag = "cframewalk"
+})
+
+PlayerTab:AddSlider({
+	Name = "CFrame Walk Speed",
+	Min = 0,
+	Max = 250,
+	Default = 0,
+	Color = Color3.fromRGB(255, 255, 255),
+	Increment = 1,
+	ValueName = "Speed",
+    Flag = "cframewalkspeed"
+})
+
+RunService.Heartbeat:Connect(function()
+	pcall(function()
+		if OrionLib.Flags["antistun"].Value == true then
+			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+				for _,Child in pairs(LocalPlayer.Character:GetChildren()) do
+					if Child.Name == "ComboStun" or Child.Name == "NoJump" or Child.Name == "Slowed" or Child.Name == "Freeze" then
+						Child:Destroy()
+					end
+				end
+			end
+		end
+		if OrionLib.Flags["antiragdoll"].Value == true then
+			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+				for _,Child in pairs(LocalPlayer.Character:GetChildren()) do
+					if Child.Name == "Ragdoll" then
+						Child:Destroy()
+					end
+				end
+			end
+		end
+		if OrionLib.Flags["antivelocity"].Value == true then
+			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+				for _,Child in pairs(LocalPlayer.Character.HumanoidRootPart:GetChildren()) do
+					if Child:IsA("BodyVelocity") then
+						if Child.Name ~= "moveme" and Child.Name ~= "dodgevelocity" then
+							Child:Destroy()
+						end
+					end
+				end
+			end
+		end
+		if OrionLib.Flags["invisblock"].Value == true then
+			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+				if LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+					if LocalPlayer.Character:GetAttribute("Blocking") and LocalPlayer.Character:GetAttribute("Blocking") == true then
+						for _,Anim in pairs(LocalPlayer.Character.Humanoid:GetPlayingAnimationTracks()) do
+							if Anim.Animation.AnimationId == "rbxassetid://10470389827" then
+								Anim:Stop()
+							end
+						end
+				
+						if not LocalPlayer.Character.HumanoidRootPart:FindFirstChild("CustomBlock") then
+							local CustomBlock = LocalPlayer.Character.HumanoidRootPart.EsperShield:Clone()
+							CustomBlock.Name = "CustomBlock"
+							CustomBlock.Parent = LocalPlayer.Character.HumanoidRootPart
+							
+							for _,v in pairs(CustomBlock:GetChildren()) do
+								if v:IsA("ParticleEmitter") then
+									v.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+									v.Enabled = true
+								end
+							end
+						else
+							local CustomBlock = LocalPlayer.Character.HumanoidRootPart.CustomBlock
+							
+							for _,v in pairs(CustomBlock:GetChildren()) do
+								if v:IsA("ParticleEmitter") then
+									v.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+									v.Enabled = true
+								end
+							end
+						end
+					else
+						if LocalPlayer.Character.HumanoidRootPart:FindFirstChild("CustomBlock") then
+							local CustomBlock = LocalPlayer.Character.HumanoidRootPart.CustomBlock
+							
+							for _,v in pairs(CustomBlock:GetChildren()) do
+								if v:IsA("ParticleEmitter") then
+									v.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+									v.Enabled = false
+								end
+							end
+						end
+					end
+				end
+			end
+		else
+			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+				if LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+					if LocalPlayer.Character.HumanoidRootPart:FindFirstChild("CustomBlock") then
+						local CustomBlock = LocalPlayer.Character.HumanoidRootPart.CustomBlock
+						
+						for _,v in pairs(CustomBlock:GetChildren()) do
+							if v:IsA("ParticleEmitter") then
+								v.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+								v.Enabled = false
+							end
+						end
+					end
+				end
+			end
+		end
+		if OrionLib.Flags["cframewalk"].Value == true then
+			if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+				if LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character:FindFirstChild("Humanoid") then
+					LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame + LocalPlayer.Character.Humanoid.MoveDirection * OrionLib.Flags["cframewalkspeed"].Value/100
+				end
+			end
+		end
+	end)
+end)
+
+OrionLib:Init()
